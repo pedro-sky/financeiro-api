@@ -13,6 +13,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -54,21 +57,24 @@ public class TransacaoService {
     }
 
     @Transactional(readOnly = true)
-    public List<TransacaoDTO.Response> listar(Integer mes, Integer ano, String tipo) {
+    public Page<TransacaoDTO.Response> listar(Integer mes, Integer ano, String tipo, Pageable pageable) {
         Usuario usuario = getUsuarioLogado();
 
-        List<Transacao> transacoes;
-
         if (mes != null && ano != null) {
-            transacoes = transacaoRepository.findByUsuarioAndMesAno(usuario, mes, ano);
-        } else if (tipo != null) {
-            Transacao.Tipo tipoEnum = Transacao.Tipo.valueOf(tipo.toUpperCase());
-            transacoes = transacaoRepository.findByUsuarioAndTipoOrderByDataDesc(usuario, tipoEnum);
-        } else {
-            transacoes = transacaoRepository.findByUsuarioOrderByDataDesc(usuario);
+            List<Transacao> transacoes = transacaoRepository.findByUsuarioAndMesAno(usuario, mes, ano);
+            List<TransacaoDTO.Response> response = transacoes.stream().map(this::toResponse).toList();
+            return new PageImpl<>(response, pageable, response.size());
         }
 
-        return transacoes.stream().map(this::toResponse).toList();
+        if (tipo != null) {
+            Transacao.Tipo tipoEnum = Transacao.Tipo.valueOf(tipo.toUpperCase());
+            List<Transacao> transacoes = transacaoRepository.findByUsuarioAndTipoOrderByDataDesc(usuario, tipoEnum);
+            List<TransacaoDTO.Response> response = transacoes.stream().map(this::toResponse).toList();
+            return new PageImpl<>(response, pageable, response.size());
+        }
+
+        return transacaoRepository.findByUsuario(usuario, pageable)
+                .map(this::toResponse);
     }
 
     @Transactional(readOnly = true)
@@ -152,6 +158,6 @@ public class TransacaoService {
     public record ResumoResponse(
             BigDecimal totalReceitas,
             BigDecimal totalDespesas,
-            BigDecimal saldo
-    ) {}
+            BigDecimal saldo) {
+    }
 }

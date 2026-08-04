@@ -26,50 +26,45 @@ public class GlobalExceptionHandler {
         });
 
         return ResponseEntity.status(400).body(
-                new ErroResponse(400, "Erro de validação nos campos", errosCampos, LocalDateTime.now())
-        );
+                new ErroResponse(400, "Erro de validação nos campos", errosCampos, LocalDateTime.now()));
     }
 
     @ExceptionHandler(Exceptions.RecursoNaoEncontradoException.class)
     public ResponseEntity<ErroResponse> handleNaoEncontrado(Exceptions.RecursoNaoEncontradoException ex) {
         return ResponseEntity.status(404).body(
-                new ErroResponse(404, ex.getMessage(), null, LocalDateTime.now())
-        );
+                new ErroResponse(404, ex.getMessage(), null, LocalDateTime.now()));
     }
 
     @ExceptionHandler(Exceptions.RecursoJaExisteException.class)
     public ResponseEntity<ErroResponse> handleJaExiste(Exceptions.RecursoJaExisteException ex) {
         return ResponseEntity.status(409).body(
-                new ErroResponse(409, ex.getMessage(), null, LocalDateTime.now())
-        );
+                new ErroResponse(409, ex.getMessage(), null, LocalDateTime.now()));
     }
 
     @ExceptionHandler(Exceptions.RegraDeNegocioException.class)
     public ResponseEntity<ErroResponse> handleRegraDeNegocio(Exceptions.RegraDeNegocioException ex) {
         return ResponseEntity.status(422).body(
-                new ErroResponse(422, ex.getMessage(), null, LocalDateTime.now())
-        );
+                new ErroResponse(422, ex.getMessage(), null, LocalDateTime.now()));
     }
 
     // Captura erro de email/senha incorretos no login
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ErroResponse> handleBadCredentials(BadCredentialsException ex) {
         return ResponseEntity.status(401).body(
-                new ErroResponse(401, "Email ou senha incorretos", null, LocalDateTime.now())
-        );
+                new ErroResponse(401, "Email ou senha incorretos", null, LocalDateTime.now()));
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErroResponse> handleErroGenerico(Exception ex) {
         return ResponseEntity.status(500).body(
-                new ErroResponse(500, "Ocorreu um erro interno. Tente novamente mais tarde.", null, LocalDateTime.now())
-        );
+                new ErroResponse(500, "Ocorreu um erro interno. Tente novamente mais tarde.", null,
+                        LocalDateTime.now()));
     }
 
     public record ErroResponse(
             int status,
             String mensagem,
             Map<String, String> errosCampos,
-            LocalDateTime timestamp
-    ) {}
+            LocalDateTime timestamp) {
+    }
 }

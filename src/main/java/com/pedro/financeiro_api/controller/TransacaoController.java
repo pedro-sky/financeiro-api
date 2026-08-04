@@ -9,6 +9,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springdoc.core.annotations.ParameterObject;
 
 import java.util.List;
 
@@ -26,11 +31,12 @@ public class TransacaoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<TransacaoDTO.Response>> listar(
+    public ResponseEntity<Page<TransacaoDTO.Response>> listar(
             @RequestParam(required = false) Integer mes,
             @RequestParam(required = false) Integer ano,
-            @RequestParam(required = false) String tipo) {
-        return ResponseEntity.ok(transacaoService.listar(mes, ano, tipo));
+            @RequestParam(required = false) String tipo,
+            @ParameterObject @PageableDefault(size = 10) Pageable pageable) {
+        return ResponseEntity.ok(transacaoService.listar(mes, ano, tipo, pageable));
     }
 
     @GetMapping("/{id}")
@@ -40,7 +46,7 @@ public class TransacaoController {
 
     @PutMapping("/{id}")
     public ResponseEntity<TransacaoDTO.Response> atualizar(@PathVariable Long id,
-                                                            @Valid @RequestBody TransacaoDTO.Request request) {
+            @Valid @RequestBody TransacaoDTO.Request request) {
         return ResponseEntity.ok(transacaoService.atualizar(id, request));
     }
 
