@@ -2,6 +2,8 @@ package com.pedro.financeiro_api.controller;
 
 import com.pedro.financeiro_api.dto.TransacaoDTO;
 import com.pedro.financeiro_api.service.TransacaoService;
+
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -13,6 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/transacoes")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "bearerAuth")
 public class TransacaoController {
 
     private final TransacaoService transacaoService;
